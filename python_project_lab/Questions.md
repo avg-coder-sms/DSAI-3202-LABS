@@ -1,4 +1,4 @@
-# Questions
+# Lab3 Part1 Questions
 
 #### How does the execution time change when moving from sequential to threaded to multiprocessing implementations?
 - Sequential: Execution time is generally the longest, as it is a single-threaded, single-process computation.
@@ -27,4 +27,56 @@ Yes, multiprocessing is generally better for CPU-bound tasks, as it avoids Globa
 ### When would you choose threading over multiprocessing or vice versa for parallel tasks?
 - Threading: Useful for I/O-bound tasks like reading from files or making network requests.
 - Multiprocessing: More suitable for CPU-bound tasks, as it avoids the GIL and utilizes multiple cores effectively.
+
+# Lab3 Part2 Questions
+### 1) How does the execution time change when moving from sequential to threaded to multiprocessing implementations?
+
+From the times provided:
+
+- **Sequential execution time**: 67.87 seconds
+- **Threading execution time**: 26.58 seconds
+- **Multiprocessing execution time**: 14.55 seconds
+
+The execution time decreases as we move from sequential to threaded and then to multiprocessing implementations. Here's the breakdown:
+
+- **Sequential to Threaded**: Execution time improves from 67.87 seconds to 26.58 seconds. This reduction occurs because threads allow multiple tasks to be handled concurrently within a single process, optimizing CPU resource usage.
+  
+- **Threaded to Multiprocessing**: Execution time improves further from 26.58 seconds to 14.55 seconds. This significant reduction happens because multiprocessing utilizes multiple CPU cores, allowing for better parallelization, especially for CPU-bound tasks.
+
+### 2) Compute the performance metrics for the threaded and multiprocessing executions:
+
+To compute the performance metrics, we calculate the following:
+
+1. **Speedup**: The speedup is the ratio of the sequential execution time to the parallel execution time (for threading or multiprocessing), showing how much faster the parallel version is.
+
+   - **Speedup for Threading**:
+     \[
+     \text{Speedup}_{\text{Threading}} = \frac{\text{Sequential Time}}{\text{Threaded Time}} = \frac{67.87}{26.58} \approx 2.55
+     \]
+     
+   - **Speedup for Multiprocessing**:
+     \[
+     \text{Speedup}_{\text{Multiprocessing}} = \frac{\text{Sequential Time}}{\text{Multiprocessing Time}} = \frac{67.87}{14.55} \approx 4.66
+     \]
+
+2. **Efficiency**: Efficiency is the ratio of the speedup to the number of threads or processes used. We'll assume 4 threads for threading and 4 processes for multiprocessing.
+
+   - **Efficiency for Threading**: Assuming 4 threads:
+     \[
+     \text{Efficiency}_{\text{Threading}} = \frac{\text{Speedup}_{\text{Threading}}}{\text{Number of Threads}} = \frac{2.55}{4} = 0.6375
+     \]
+
+   - **Efficiency for Multiprocessing**: Assuming 4 processes:
+     \[
+     \text{Efficiency}_{\text{Multiprocessing}} = \frac{\text{Speedup}_{\text{Multiprocessing}}}{\text{Number of Processes}} = \frac{4.66}{4} = 1.165
+     \]
+
+### Summary:
+
+- **Threading Speedup**: 2.55
+- **Threading Efficiency**: 0.6375 (assuming 4 threads)
+- **Multiprocessing Speedup**: 4.66
+- **Multiprocessing Efficiency**: 1.165 (assuming 4 processes)
+
+As the number of processes increases in multiprocessing, we see both higher speedup and efficiency compared to threading.
 
