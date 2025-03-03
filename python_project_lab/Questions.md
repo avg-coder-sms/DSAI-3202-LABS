@@ -49,27 +49,15 @@ To compute the performance metrics, we calculate the following:
 
 1. **Speedup**: The speedup is the ratio of the sequential execution time to the parallel execution time (for threading or multiprocessing), showing how much faster the parallel version is.
 
-   - **Speedup for Threading**:
-     \[
-     \text{Speedup}_{\text{Threading}} = \frac{\text{Sequential Time}}{\text{Threaded Time}} = \frac{67.87}{26.58} \approx 2.55
-     \]
+   - **Speedup for Threading**:2.55
      
-   - **Speedup for Multiprocessing**:
-     \[
-     \text{Speedup}_{\text{Multiprocessing}} = \frac{\text{Sequential Time}}{\text{Multiprocessing Time}} = \frac{67.87}{14.55} \approx 4.66
-     \]
+   - **Speedup for Multiprocessing**:4.66
 
 2. **Efficiency**: Efficiency is the ratio of the speedup to the number of threads or processes used. We'll assume 4 threads for threading and 4 processes for multiprocessing.
 
-   - **Efficiency for Threading**: Assuming 4 threads:
-     \[
-     \text{Efficiency}_{\text{Threading}} = \frac{\text{Speedup}_{\text{Threading}}}{\text{Number of Threads}} = \frac{2.55}{4} = 0.6375
-     \]
+   - **Efficiency for Threading**: Assuming 4 threads:0.6375
 
-   - **Efficiency for Multiprocessing**: Assuming 4 processes:
-     \[
-     \text{Efficiency}_{\text{Multiprocessing}} = \frac{\text{Speedup}_{\text{Multiprocessing}}}{\text{Number of Processes}} = \frac{4.66}{4} = 1.165
-     \]
+   - **Efficiency for Multiprocessing**: Assuming 4 processes:1.165
 
 ### Summary:
 
