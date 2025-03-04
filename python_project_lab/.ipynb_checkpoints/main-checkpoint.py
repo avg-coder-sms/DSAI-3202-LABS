@@ -1,10 +1,31 @@
-from src.data_loader import load_data
-from src.preprocessing import split_data
-from src.model import train_model
-from src.evaluation import evaluate_model
+import threading
+import time
+from src.sensor_simulation import *
+from src.data_processing import *
+from src.display_logic import *
 
-data = load_data()
-X_train, X_test, y_train, y_test = split_data(data)
-model = train_model(X_train, y_train)
-report = evaluate_model(model, X_test, y_test)
-print(report)
+# Initialize display
+initialize_display()
+
+# Create sensor threads
+sensor_threads = [threading.Thread(target=simulate_sensor, args=(i,), daemon=True) for i in range(3)]
+
+# Create data processing thread
+processing_thread = threading.Thread(target=process_temperatures, daemon=True)
+
+# Create display update thread (refresh every 5s)
+display_thread = threading.Thread(target=update_display, daemon=True)
+
+# Start all threads
+for thread in sensor_threads:
+    thread.start()
+
+processing_thread.start()
+display_thread.start()
+
+# Keep the main thread running
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    print("\nStopping simulation.")
