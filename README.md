@@ -1,29 +1,25 @@
-# Temperature Monitoring System  
+# Summary
 
-## **1. Synchronization Metrics Used**  
+## Parallelization Results:
+- **Speedup**: 2.42
+- **Efficiency**: 0.40
 
-The following synchronization techniques were applied in different parts of the project to ensure thread safety and proper data flow:  
+By parallelizing the image processing code, I achieved a speedup of 2.42, though the efficiency dropped to 0.40, indicating that not all processors were fully utilized.
 
-| **Task**                            | **Synchronization Metric Used** | **Reason** |
-|--------------------------------------|--------------------------------|------------|
-| Simulating sensor readings (`simulate_sensor`) | `RLock` (Reentrant Lock) | Ensures that multiple sensors can safely update the shared `latest_temperatures` dictionary without conflicts. |
-| Processing temperature data (`process_temperatures`) | `Condition` (with a `Queue`) | Used to synchronize temperature calculations, ensuring the processor waits for new sensor data before computing averages. |
-| Displaying real-time updates (`update_display`) | `RLock` | Prevents race conditions while accessing shared dictionaries (`latest_temperatures` and `temperature_averages`). |
-| Managing data transfer (`Queue`) | `Queue` (thread-safe structure) | Used for safe communication between the sensor threads and the processor thread. |
+---
 
-## **2. Why Did the Professor Not Ask to Compute Metrics?**  
+## Machine Learning Model Results:
+- **Random Forest and SVM**: Both performed poorly with low recall and F1-Score. They mainly predicted one class, leading to misleading accuracy and high precision.
+- **Logistic Regression**: Performed better with higher recall and F1-Score but still needs improvement in precision.
 
-The professor likely did not require explicit metric computation (e.g., performance benchmarks) because:  
+---
 
-1. **Focus on Thread Synchronization**  
-   - The primary goal of the assignment is to apply synchronization concepts (`RLock`, `Condition`, and `Queue`), rather than measure execution speed or resource usage.  
+## Improvement Suggestions:
+1. **Address Class Imbalance** with resampling techniques or class weight adjustment.
+2. **Hyperparameter Tuning** using `GridSearchCV` or `RandomizedSearchCV`.
+3. **Feature Engineering** like scaling and feature selection.
+4. **Try Other Models** such as Gradient Boosting or XGBoost.
+5. **Use Cross-Validation** for better performance evaluation.
+6. **Analyze Diagnostics** like confusion matrices and metrics (precision, recall, F1-score) for further insight.
 
-2. **Predictable Execution Patterns**  
-   - Since sensor readings and processing occur at predefined intervals (1s for readings, 5s for display updates), performance analysis is less critical.  
-
-3. **Introductory Nature of the Task**  
-   - The assignment focuses on understanding **concurrent programming** in Python rather than optimizing execution time or memory usage.  
-
-4. **No High-Performance Requirement**  
-   - The system is relatively lightweight, meaning advanced metrics like execution time or CPU utilization would not provide significant insights.  
-
+By implementing these strategies, I aim to enhance the performance and generalization of my models.
