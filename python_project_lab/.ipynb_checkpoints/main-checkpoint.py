@@ -1,10 +1,15 @@
-from src.data_loader import load_data
-from src.preprocessing import split_data
-from src.model import train_model
-from src.evaluation import evaluate_model
+import time
+from src.sequential import run_sequential
+from src.parallel import run_parallel
 
-data = load_data()
-X_train, X_test, y_train, y_test = split_data(data)
-model = train_model(X_train, y_train)
-report = evaluate_model(model, X_test, y_test)
-print(report)
+def main():
+    # Run the sequential and parallel tasks
+    run_sequential()
+    run_parallel()
+
+if __name__ == "__main__":
+    start_time = time.time()
+    main()
+    end_time = time.time()
+    total_execution_time = end_time - start_time
+    print(f"Total execution time for both sequential and parallel runs: {total_execution_time} seconds.")
