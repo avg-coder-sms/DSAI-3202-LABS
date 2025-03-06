@@ -1,31 +1,29 @@
+
 import threading
 import time
-from src.sensor_simulation import *
-from src.data_processing import *
-from src.display_logic import *
+from queue import Queue
+from src.sensor import simulate_sensor
+from src.processor import process_temperatures
+from src.display import initialize_display, update_display
 
-# Initialize display
-initialize_display()
+if __name__ == "__main__":
+    temp_queue = Queue()
+    condition = threading.Condition()
 
-# Create sensor threads
-sensor_threads = [threading.Thread(target=simulate_sensor, args=(i,), daemon=True) for i in range(3)]
+    initialize_display()
 
-# Create data processing thread
-processing_thread = threading.Thread(target=process_temperatures, daemon=True)
+    # Create and start sensor threads
+    sensor_threads = [threading.Thread(target=simulate_sensor, args=(i, temp_queue, condition), daemon=True) for i in range(3)]
+    for thread in sensor_threads:
+        thread.start()
 
-# Create display update thread (refresh every 5s)
-display_thread = threading.Thread(target=update_display, daemon=True)
-
-# Start all threads
-for thread in sensor_threads:
-    thread.start()
-
-processing_thread.start()
-display_thread.start()
-
-# Keep the main thread running
-try:
+    # Create and start processing thread
+    processor_thread = threading.Thread(target=process_temperatures, args=(temp_queue, condition), daemon=True)
+    processor_thread.start()
+    
+    # Create and start display thread
+    display_thread = threading.Thread(target=update_display, daemon=True)
+    display_thread.start()
+    
     while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    print("\nStopping simulation.")
+        time.sleep(1)  # Keep main thread alive
