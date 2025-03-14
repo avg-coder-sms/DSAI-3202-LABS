@@ -37,11 +37,23 @@ def pool_map_squares(numbers):
     with multiprocessing.Pool() as pool:
         return pool.map(square, numbers)
 
+def pool_map_async_squares(numbers):
+    """Computes squares asynchronously using multiprocessing Pool with map_async()."""
+    with multiprocessing.Pool() as pool:
+        result = pool.map_async(square, numbers)
+        return result.get()  # Wait for results
+
 def pool_apply_squares(numbers):
     """Computes squares using multiprocessing Pool with apply()."""
     with multiprocessing.Pool() as pool:
         results = [pool.apply(square, args=(n,)) for n in numbers]
     return results
+
+def pool_apply_async_squares(numbers):
+    """Computes squares asynchronously using multiprocessing Pool with apply_async()."""
+    with multiprocessing.Pool() as pool:
+        results = [pool.apply_async(square, args=(n,)) for n in numbers]
+        return [r.get() for r in results]  # Wait for each result
 
 def concurrent_squares(numbers):
     """Computes squares using concurrent.futures ProcessPoolExecutor."""
