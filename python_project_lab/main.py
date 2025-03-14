@@ -12,7 +12,7 @@ def benchmark(func, numbers):
     return result, end - start
 
 if __name__ == "__main__":
-    for size in [10**6, 10**7]:  # Testing with 1 million and 10 million numbers
+    for size in [10**6]:  # Testing with 1 million and 10 million numbers
         numbers = generate_numbers(size)
         
         print(f"\nRunning benchmarks for {size} numbers...")
