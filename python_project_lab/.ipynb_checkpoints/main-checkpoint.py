@@ -2,7 +2,7 @@ import multiprocessing
 import concurrent.futures
 import random
 import time
-from src.square_compute import *
+from src.square_compute import square, generate_numbers, sequential_squares, multiprocessing_squares, pool_map_squares, pool_apply_squares, concurrent_squares
 from src.connection_pool import run_connection_pool_test
 
 def benchmark(func, numbers):
