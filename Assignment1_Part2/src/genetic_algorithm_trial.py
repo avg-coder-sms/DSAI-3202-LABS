@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from genetic_algorithms_functions import calculate_fitness, \
     select_in_tournament, order_crossover, mutate, \
-    generate_unique_population, generate_valid_population
+    generate_unique_population
 import time
 
 start_time = time.time()
@@ -22,7 +22,6 @@ stagnation_limit = 5  # Number of generations without improvement before regener
 # Generate initial population: each individual is a route starting at node 0
 np.random.seed(42)  # For reproducibility
 population = generate_unique_population(population_size, num_nodes)
-#population = generate_valid_population(distance_matrix, population_size, num_nodes)
 
 # Initialize variables for tracking stagnation
 best_calculate_fitness = int(1e6)
