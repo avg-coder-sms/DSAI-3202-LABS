@@ -22,7 +22,7 @@ Multiprocessing Pool (apply_async, asynchronous) execution time: 539.1315 sec
 - **Multiprocessing Pool (`apply` method, synchronous)** took an extremely long time (**166 sec for 1M numbers**), making it highly inefficient.  
 - **Multiprocessing Pool (`apply_async` method, asynchronous)** was faster but still significantly slower than **map-based approaches**.  
 - **Concurrent.futures** was also **very slow** compared to `map()`.  
-- For **10M numbers**, some benchmarks could not be completed due to insufficient memory.  
+- For **1M & 10M numbers**, some benchmarks could not be completed due to insufficient memory.  
 - The **apply() method (synchronous)** was skipped for 10M numbers because it was too slow and inefficient.  
 - **`map()` and `map_async()`** remained the most efficient approaches.  
 

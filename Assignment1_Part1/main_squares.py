@@ -1,6 +1,6 @@
 import time
 from src.square_program.square_compute import (
-    square, generate_numbers, sequential_squares, multiprocessing_squares, 
+    generate_numbers, sequential_squares, multiprocessing_squares, 
     pool_map_squares, pool_apply_squares, concurrent_squares, 
     pool_map_async_squares, pool_apply_async_squares
 )
@@ -22,8 +22,8 @@ if __name__ == "__main__":
         _, seq_time = benchmark(sequential_squares, numbers)
         print(f"Sequential execution time: {seq_time:.4f} sec")
         
-        #_, mp_time = benchmark(multiprocessing_squares, numbers)
-        #print(f"Multiprocessing (individual processes) execution time: {mp_time:.4f} sec")
+        _, mp_time = benchmark(multiprocessing_squares, numbers)
+        print(f"Multiprocessing (individual processes) execution time: {mp_time:.4f} sec")
         
         _, pool_map_time = benchmark(pool_map_squares, numbers)
         print(f"Multiprocessing Pool (map, synchronous) execution time: {pool_map_time:.4f} sec")

@@ -17,20 +17,17 @@ def sequential_squares(numbers):
 def multiprocessing_squares(numbers):
     """Computes squares using individual multiprocessing processes."""
     processes = []
-    results = multiprocessing.Manager().list()
-
-    def compute_square(num):
-        results.append(square(num))
+    results = []
 
     for num in numbers:
-        p = multiprocessing.Process(target=compute_square, args=(num,))
+        p = multiprocessing.Process(target=square, args=(num,))
         processes.append(p)
         p.start()
 
     for p in processes:
         p.join()
 
-    return list(results)
+    return results
 
 def pool_map_squares(numbers):
     """Computes squares using multiprocessing Pool with map()."""
