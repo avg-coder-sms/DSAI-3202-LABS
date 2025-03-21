@@ -264,3 +264,55 @@ mpirun -n 4 python3 parallel_genetic_algorithm.py
 ```
 # 7 Enhancements
 
+## Summary of Enhancements  
+
+**Parallelized fitness evaluation** across multiple machines for speedup.  
+**Elitism strategy** preserves the best solution across generations.  
+**Adaptive mutation rate** adjusts based on stagnation to escape local minima.  
+**Dynamic load balancing** ensures even workload distribution across machines.  
+**MPI for distributed computing** over two or more machines.  
+
+## Output
+Best Solution: [ 0 12  7 15 18 31 28  5  3  6  9 23 22 20  1  2 10 25 13 29 11 30  8 21
+  4 19 14 26 17 27 16 24]
+Total Distance: -1800505.0
+Parallel Execution Time: 6.69 seconds
+
+## **Performance Comparison**  
+
+| Metric                         | Before Enhancements | After Enhancements |
+|--------------------------------|---------------------|--------------------|
+| Execution Time (seconds)       | 8.85            | 6.69           |
+| Best Fitness Score             | -1600910.0            | -1800505.0           |
+| Speedup | 2.2               | 2.93              |
+| Efficiency                 | 0.55             | 0.73            |
+
+## Running the Enhanced Parallel Code  
+
+To execute on multiple machines:  
+
+```bash
+mpirun -hostfile hosts.txt -n 8 python enhanced_genetic_algorithm.py
+```
+
+# 8 Running the Program with Extended City Map 
+
+## Adding More Cars to the Problem  
+
+In the current problem, a single car follows a route to visit all cities. To add more cars, we can modify the genetic algorithm as follows:  
+
+1. **Multi-Route Representation**  
+   - Instead of a single route, each solution (individual) should encode multiple routes, one per car.  
+   - Assign cities to different cars while ensuring all cities are visited once.  
+
+2. **Fitness Function Update**  
+   - The fitness function should evaluate the **total travel distance** for all cars instead of just one.  
+   - Constraints must be added to balance workload distribution across cars.  
+
+3. **Crossover & Mutation Adjustments**  
+   - Crossover should swap city assignments between different cars while maintaining route feasibility.  
+   - Mutation should allow reassigning cities between cars to improve overall efficiency.  
+
+4. **Load Balancing Strategy**  
+   - A constraint or penalty can be introduced to encourage even distribution of cities among all cars.  
+   - Alternatively, a heuristic can optimize assignments to minimize total travel distance.  
