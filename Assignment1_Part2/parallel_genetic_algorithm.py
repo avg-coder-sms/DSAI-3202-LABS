@@ -1,7 +1,7 @@
 from mpi4py import MPI
 import numpy as np
 import pandas as pd
-from genetic_algorithms_functions import calculate_fitness, \
+from src.genetic_algorithms_functions import calculate_fitness, \
     select_in_tournament, order_crossover, mutate, \
     generate_unique_population
 import time

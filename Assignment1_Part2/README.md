@@ -264,13 +264,109 @@ mpirun -n 4 python3 parallel_genetic_algorithm.py
 ```
 # 7 Enhancements
 
-## Summary of Enhancements  
+## **1. Parallelized Fitness Evaluation using MPI**
+### **Why?**  
+In the original sequential implementation, fitness evaluation was performed for each individual in the population one by one, making it the most computationally expensive step. By using **MPI (Message Passing Interface)**, we distribute this computation across multiple machines to significantly reduce execution time.
 
-**Parallelized fitness evaluation** across multiple machines for speedup.  
-**Elitism strategy** preserves the best solution across generations.  
-**Adaptive mutation rate** adjusts based on stagnation to escape local minima.  
-**Dynamic load balancing** ensures even workload distribution across machines.  
-**MPI for distributed computing** over two or more machines.  
+### **How?**  
+- The fitness evaluation step:  
+  ```python
+  calculate_fitness_values = np.array([calculate_fitness(route, distance_matrix) for route in population])
+  ```
+  is parallelized by distributing chunks of the population across different machines, allowing each machine to process fitness calculations independently.
+
+- **MPI Code Snippet:**
+  ```python
+  from mpi4py import MPI
+  
+  comm = MPI.COMM_WORLD
+  rank = comm.Get_rank()
+  size = comm.Get_size()
+
+  chunk_size = len(population) // size
+  local_population = population[rank * chunk_size:(rank + 1) * chunk_size]
+
+  local_fitness_values = np.array([calculate_fitness(route, distance_matrix) for route in local_population])
+
+  # Gather results at the root process
+  global_fitness_values = np.zeros(len(population))
+  comm.Gather(local_fitness_values, global_fitness_values, root=0)
+  ```
+
+- This allows each machine to compute fitness for a subset of the population, reducing total computation time.
+
+---
+
+## **2. Elitism Strategy to Preserve the Best Solution**
+### **Why?**  
+In genetic algorithms, **elitism** ensures that the best solution from one generation is carried forward to the next, preventing loss of the best-found solutions due to crossover or mutation.
+
+### **How?**  
+- Before replacement, we store the best individual:
+  ```python
+  best_idx = np.argmin(calculate_fitness_values)
+  best_individual = population[best_idx]
+  ```
+- The best individual is **always preserved**:
+  ```python
+  new_population[0] = best_individual  # Keep the best solution in the next generation
+  ```
+
+- This prevents **good solutions from being lost**, ensuring steady improvement across generations.
+
+---
+
+## **3. Adaptive Mutation Rate for Escaping Local Minima**
+### **Why?**  
+A fixed mutation rate can make the algorithm **too rigid**—either converging too early (if too low) or causing excessive randomness (if too high). An **adaptive mutation rate** adjusts based on **stagnation** (when the best fitness hasn’t improved for multiple generations).
+
+### **How?**  
+- The mutation rate **increases** if the best solution has stagnated:
+  ```python
+  if stagnation_counter >= stagnation_limit:
+      mutation_rate *= 1.5  # Increase mutation rate to escape local minima
+  else:
+      mutation_rate = max(0.1, mutation_rate * 0.95)  # Decay mutation rate slightly
+  ```
+- This helps the algorithm explore new solutions dynamically.
+
+---
+
+## **4. Dynamic Load Balancing for Even Work Distribution**
+### **Why?**  
+When distributing computations across machines, some processes may complete faster than others due to **uneven workload distribution**. This leads to inefficiencies where some machines are idle while others are still computing.
+
+### **How?**  
+- Instead of static partitioning, **dynamic load balancing** ensures machines request new tasks **as they complete previous ones**.
+- Implemented with MPI’s **scatter-gather approach**:
+  ```python
+  while not all_tasks_completed:
+      local_population = comm.scatter(population_chunks, root=0)
+      local_results = [calculate_fitness(route, distance_matrix) for route in local_population]
+      comm.gather(local_results, root=0)
+  ```
+- This keeps all machines busy **at all times**, improving efficiency.
+
+
+## **5. Distributed Execution with MPI for Multi-Machine Scaling**
+### **Why?**  
+By distributing the algorithm over multiple machines, we **significantly reduce execution time** while handling larger populations.
+
+### **How?**  
+- Machines are specified in `hosts.txt`
+- Running with MPI:
+- This ensures workload is **evenly divided**.
+
+
+
+# **Conclusion**
+These enhancements improve the efficiency and robustness of the genetic algorithm by:
+1. **Reducing execution time** through parallelization.
+2. **Preserving high-quality solutions** with elitism.
+3. **Escaping local minima** with adaptive mutation.
+4. **Ensuring balanced workload** distribution.
+5. **Scaling across multiple machines** using MPI.
+
 
 ## Output
 Best Solution: [ 0 12  7 15 18 31 28  5  3  6  9 23 22 20  1  2 10 25 13 29 11 30  8 21
@@ -296,6 +392,24 @@ mpirun -hostfile hosts.txt -n 8 python enhanced_genetic_algorithm.py
 ```
 
 # 8 Running the Program with Extended City Map 
+
+## Running the Enhanced Parallel Code  
+
+To execute on multiple machines:  
+
+```bash
+mpirun -hostfile hosts.txt -n 8 python extended_genetic_algorithm.py
+```
+
+## Output
+
+Best Solution: [ 0 65 76 95  1 87  7  6  3 79 43 13 22 81 74 85 20 72 84 39 69 73 36 97
+ 49 51 77 15 88 66 53 70 83 75  8 98 32 82 24 11 90 56 12 28 14 94 78 31
+ 50 16 61 46 33 19 60 40 63 91 92 55 52  5 37 18 80 10 99 48 47 42 86 29
+  9 41 38 34 45 71 58 26 25 59 67 64 57 62  4 17 93 54 30 35 89  2 21 27
+ 23 44 96 68]
+Total Distance: -3802866.0
+Parallel Execution Time: 18.51 seconds
 
 ## Adding More Cars to the Problem  
 

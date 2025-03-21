@@ -28,35 +28,6 @@ def calculate_fitness(route, distance_matrix):
     
     return -total_distance  # Negative because we want to minimize distance
 
-# def calculate_fitness(route,
-#                       distance_matrix):
-#     """
-#     calculate_fitness function: total distance traveled by the car.
-
-#     Parameters:
-#         - route (list): A list representing the order of nodes visited in the route.
-#         - distance_matrix (numpy.ndarray): A matrix of the distances between nodes.
-#             A 2D numpy array where the element at position [i, j] represents the distance between node i and node j.
-#     Returns:
-#         - float: The negative total distance traveled (negative because we want to minimize distance).
-#            Returns a large negative penalty if the route is infeasible.
-#     """
-#     total_distance = 0
-    
-#     # add your code here.
-#     for i in range(len(route) - 1):
-#         node1, node2 = route[i], route[i + 1]
-#         distance = distance_matrix[node1][node2]
-        
-#         if distance == 100000:  # Large value indicates an infeasible route
-#             return -1e6  # Penalize infeasible solutions
-        
-#         total_distance += distance
-
-#     # Ensure the route returns to the depot (node 0)
-#     total_distance += distance_matrix[route[-1]][route[0]]
-#     return total_distance
-
 
 def select_in_tournament(population,
                          scores,
@@ -76,7 +47,6 @@ def select_in_tournament(population,
     """
     selected = []
     
-    # add your code here.
     for _ in range(number_tournaments):
         # Select tournament_size individuals randomly
         idx = np.random.choice(len(population), tournament_size, replace=False)

@@ -11,7 +11,7 @@ size = comm.Get_size()
 
 # Load the distance matrix only on rank 0
 if rank == 0:
-    distance_matrix = pd.read_csv('/home/student/DSAI-3202-LABS/Assignment1_Part2/data/city_distances.csv').to_numpy()
+    distance_matrix = pd.read_csv('/home/student/DSAI-3202-LABS/Assignment1_Part2/data/city_distances_extended.csv').to_numpy()
     
 else:
     distance_matrix = None  # Initialize for other processes
