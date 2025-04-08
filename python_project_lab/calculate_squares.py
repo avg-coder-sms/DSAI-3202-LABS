@@ -12,7 +12,7 @@ def main():
     rank = comm.Get_rank()
     size = comm.Get_size()
     
-    n = 10000000  # Adjust this value as needed for different sizes
+    n = int(1e8)  # Adjust this value as needed for different sizes
     # Split the work: each process will handle a subset of the range
     chunk_size = n // size
     
