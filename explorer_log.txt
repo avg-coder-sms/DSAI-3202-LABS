@@ -1,0 +1,27 @@
+Spawning 20 parallel explorers...
+
+=== Results from all explorers ===
+Explorer 1: Time = 0.00s, Moves = 142, Backtracks = 0
+Explorer 2: Time = 0.00s, Moves = 500, Backtracks = 0
+Explorer 3: Time = 0.00s, Moves = 51, Backtracks = 0
+Explorer 4: Time = 0.00s, Moves = 235, Backtracks = 0
+Explorer 5: Time = 0.00s, Moves = 243, Backtracks = 0
+Explorer 6: Time = 0.00s, Moves = 436, Backtracks = 0
+Explorer 7: Time = 0.00s, Moves = 86, Backtracks = 0
+Explorer 8: Time = 0.00s, Moves = 402, Backtracks = 0
+Explorer 9: Time = 0.00s, Moves = 510, Backtracks = 0
+Explorer 10: Time = 0.00s, Moves = 571, Backtracks = 0
+Explorer 11: Time = 0.00s, Moves = 212, Backtracks = 0
+Explorer 12: Time = 0.00s, Moves = 600, Backtracks = 0
+Explorer 13: Time = 0.00s, Moves = 380, Backtracks = 0
+Explorer 14: Time = 0.00s, Moves = 398, Backtracks = 0
+Explorer 15: Time = 0.00s, Moves = 623, Backtracks = 0
+Explorer 16: Time = 0.00s, Moves = 128, Backtracks = 0
+Explorer 17: Time = 0.00s, Moves = 257, Backtracks = 0
+Explorer 18: Time = 0.00s, Moves = 250, Backtracks = 0
+Explorer 19: Time = 0.00s, Moves = 85, Backtracks = 0
+Explorer 20: Time = 0.00s, Moves = 246, Backtracks = 0
+
+🏆 Best Explorer Performance:
+Time: 0.00s, Moves: 51, Backtracks: 0
+Total parallel runtime: 2.09s
