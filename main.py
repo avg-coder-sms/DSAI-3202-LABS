@@ -1,41 +1,38 @@
-"""
-Main entry point for the maze runner game.
-"""
+# main.py
 
 import argparse
-from src.game import run_game
-from src.explorer import Explorer
-
+from tasks import run_explorer
+from time import time
 
 def main():
-    parser = argparse.ArgumentParser(description="Maze Runner Game")
-    parser.add_argument("--type", choices=["random", "static"], default="random",
-                        help="Type of maze to generate (random or static)")
-    parser.add_argument("--width", type=int, default=30,
-                        help="Width of the maze (default: 30, ignored for static mazes)")
-    parser.add_argument("--height", type=int, default=30,
-                        help="Height of the maze (default: 30, ignored for static mazes)")
-    parser.add_argument("--auto", action="store_true",
-                        help="Run automated maze exploration")
-    parser.add_argument("--visualize", action="store_true",
-                        help="Visualize the automated exploration in real-time")
-    
+    parser = argparse.ArgumentParser(description="Parallel Maze Explorer")
+    parser.add_argument("--type", choices=["random", "static"], default="random")
+    parser.add_argument("--width", type=int, default=30)
+    parser.add_argument("--height", type=int, default=30)
+    parser.add_argument("--explorers", type=int, default=5,
+                        help="Number of explorers to run in parallel")
     args = parser.parse_args()
-    
-    if args.auto:
-        # Create maze and run automated exploration
-        from src.maze import create_maze
-        maze = create_maze(args.width, args.height, args.type)
-        explorer = Explorer(maze, visualize=args.visualize)
-        time_taken, moves = explorer.solve()
-        print(f"Maze solved in {time_taken:.2f} seconds")
-        print(f"Number of moves: {len(moves)}")
-        if args.type == "static":
-            print("Note: Width and height arguments were ignored for the static maze")
-    else:
-        # Run the interactive game
-        run_game(maze_type=args.type, width=args.width, height=args.height)
 
+    print(f"Spawning {args.explorers} parallel explorers...")
+    task_results = []
+
+    start_time = time()
+    for _ in range(args.explorers):
+        task = run_explorer.delay(args.width, args.height, args.type)
+        task_results.append(task)
+
+    results = [task.get(timeout=120) for task in task_results]
+    total_time = time() - start_time
+
+    print("\n=== Results from all explorers ===")
+    for idx, res in enumerate(results):
+        print(f"Explorer {idx+1}: Time = {res['time_taken']:.2f}s, "
+              f"Moves = {res['moves']}, Backtracks = {res['backtracks']}")
+
+    best = sorted(results, key=lambda r: (r['time_taken'], r['moves']))[0]
+    print("\n🏆 Best Explorer Performance:")
+    print(f"Time: {best['time_taken']:.2f}s, Moves: {best['moves']}, Backtracks: {best['backtracks']}")
+    print(f"Total parallel runtime: {total_time:.2f}s")
 
 if __name__ == "__main__":
     main()
