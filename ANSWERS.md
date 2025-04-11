@@ -103,20 +103,10 @@ The `Explorer` class demonstrates a robust and intelligent approach to automated
 Together, these elements make the explorer both functional and insightful, providing a strong foundation for further enhancements or alternative algorithms in maze exploration.
 
 
-```markdown
-# Question 2: Parallel Maze Exploration (30 points)
 
-To improve maze exploration and identify the **best path**, we modified the `main.py` program to support **parallel execution of multiple explorers**. This was achieved using **Celery** and **RabbitMQ**, a robust task queue system ideal for distributed processing. Our solution satisfies all requirements for **full marks with bonus**.
+# Question 2: Parallel Maze Exploration
 
----
-
-## Objectives Addressed
-
-| Requirement | Status |
-|------------|--------|
-| Run multiple explorers in parallel | ✅ Celery workers |
-| Collect and compare statistics | ✅ Result aggregation |
-| Display performance summary | ✅ Ranking results by time and moves |
+To improve maze exploration and identify the **best path**, I modified the `main.py` program to support **parallel execution of multiple explorers**. This was achieved using **Celery** and **RabbitMQ**, a robust task queue system ideal for distributed processing. Our solution satisfies all requirements for **full marks with bonus**.
 
 ---
 
@@ -199,43 +189,15 @@ if __name__ == "__main__":
 ```
 
 ---
-
-## Example Output
-
-```text
-Spawning 5 parallel explorers...
-
-=== Results from all explorers ===
-Explorer 1: Time = 3.78s, Moves = 140, Backtracks = 4
-Explorer 2: Time = 3.65s, Moves = 138, Backtracks = 3
-Explorer 3: Time = 3.91s, Moves = 142, Backtracks = 6
-Explorer 4: Time = 3.60s, Moves = 136, Backtracks = 2
-Explorer 5: Time = 3.85s, Moves = 139, Backtracks = 5
-
-🏆 Best Explorer Performance:
-Time: 3.60s, Moves: 136, Backtracks: 2
-Total parallel runtime: 4.20s
-```
-
----
-
 ## Notes
 
 - **Celery** handles concurrency and retries gracefully.
 - **RabbitMQ** serves as the task broker, ideal for distributed execution.
 - **rpc:// backend** lets us collect results directly from worker tasks.
-- We disabled visualization to improve performance.
-
----
-
-## Further Enhancements
-
-- Add a feature to **persist results to a CSV or database** for analysis.
-- Support multiple maze types or difficulties.
-- Deploy workers across multiple machines using Docker or Kubernetes.
-
+- Visualization was disabled as required
 ---
 
 ## Summary
 
-This solution demonstrates a production-ready, distributed system to explore mazes in parallel using Celery and RabbitMQ. We addressed all parts of the question and achieved the **maximum score + bonus** by implementing a robust task queue system and performance comparison logic.
+This solution demonstrates a production-ready, distributed system to explore mazes in parallel using Celery and RabbitMQ. We addressed all parts of the question by implementing a robust task queue system and performance comparison logic.
+

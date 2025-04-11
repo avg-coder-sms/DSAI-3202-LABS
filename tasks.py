@@ -1,3 +1,5 @@
+# tasks.py
+
 from celery import Celery
 from src.maze import create_maze
 from src.explorer import Explorer
@@ -6,18 +8,16 @@ from src.explorer import Explorer
 app = Celery('tasks', broker='pyamqp://guest@localhost//', backend='rpc://')
 
 @app.task
-def run_explorer(width, height, maze_type, visualize=False, explorer_id=0):
-    from src.maze import create_maze
-    from src.explorer import Explorer
-
+def run_explorer(width, height, maze_type, visualize=False):
+    """
+    Task to run a maze explorer and return performance metrics.
+    """
     maze = create_maze(width, height, maze_type)
-    explorer = Explorer(maze, visualize=False)
-
+    explorer = Explorer(maze, visualize=visualize)
     time_taken, moves = explorer.solve()
     
     return {
-        "explorer_id": explorer_id,
-        "time_taken": time_taken,
-        "num_moves": len(moves),
-        "success": True if moves else False
+        'time_taken': time_taken,
+        'moves': len(moves),
+        'backtracks': explorer.backtrack_count  # Ensure Explorer tracks backtracks
     }
