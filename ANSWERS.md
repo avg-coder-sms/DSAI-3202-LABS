@@ -74,7 +74,7 @@ Once the maze is solved, the explorer prints out performance statistics to asses
 - **Number of Backtrack Operations**: Count of how often the explorer had to reverse its path.
 - **Average Moves per Second**: Speed of the solving process.
 
-### Sample Output:
+### Output:
 ```text
 === Maze Exploration Statistics ===
 Total time taken: 3.87 seconds
@@ -106,7 +106,7 @@ Together, these elements make the explorer both functional and insightful, provi
 
 # Question 2: Parallel Maze Exploration
 
-To improve maze exploration and identify the **best path**, I modified the `main.py` program to support **parallel execution of multiple explorers**. This was achieved using **Celery** and **RabbitMQ**, a robust task queue system ideal for distributed processing. Our solution satisfies all requirements for **full marks with bonus**.
+To improve maze exploration and identify the **best path**, I modified the `main.py` program to support **parallel execution of multiple explorers**. This was achieved using **Celery** and **RabbitMQ**, a robust task queue system ideal for distributed processing.
 
 ---
 
@@ -114,7 +114,7 @@ To improve maze exploration and identify the **best path**, I modified the `main
 
 ### 1. **Celery-Based Parallel Execution**
 
-We refactored the explorer logic into a Celery task and used RabbitMQ as the broker to queue exploration jobs. This allows exploration tasks to be **distributed across multiple cores or machines**.
+I refactored the explorer logic into a Celery task and used RabbitMQ as the broker to queue exploration jobs. This allows exploration tasks to be **distributed across multiple machines**.
 
 #### Required Files
 
@@ -199,9 +199,9 @@ if __name__ == "__main__":
 
 ## Summary
 
-This solution demonstrates a production-ready, distributed system to explore mazes in parallel using Celery and RabbitMQ. We addressed all parts of the question by implementing a robust task queue system and performance comparison logic.
+This solution demonstrates a production-ready, distributed system to explore mazes in parallel using Celery and RabbitMQ.
 
-# Questione3: Maze Explorer Performance Analysis (Static Maze)
+# Question 3: Maze Explorer Performance Analysis (Static Maze)
 
 ## Experiment Setup
 - **Maze Type**: Static
@@ -241,18 +241,15 @@ This solution demonstrates a production-ready, distributed system to explore maz
 ## Observations & Analysis
 
 1. **Identical Performance Across All Explorers**  
-   Every explorer completed the maze using exactly **1279 moves** with **0 backtracks**. This consistency indicates that the static maze is deterministic and the algorithm used (likely the right-hand rule) follows a fixed path regardless of the process or ID.
+   Every explorer completed the maze using exactly **1279 moves** with **0 backtracks**. This consistency indicates that the static maze is deterministic and the algorithm used (the right-hand rule) follows a fixed path regardless of the process or ID.
 
 2. **No Backtracking Observed**  
    The lack of any backtracking implies:
    - The path does not require the explorer to return on its steps.
-   - The right-hand rule or wall-following strategy is highly effective in this specific maze configuration.
+   - The right-hand rule is highly effective in this specific maze configuration.
 
 3. **Negligible Time Differences**  
    All runs were completed in **~0.00s**, with only one showing a marginal difference of **0.01s**. This likely reflects minor variations in task scheduling rather than any actual computational difference.
-
-4. **Deterministic vs. Random Mazes**  
-   This test was run on a **static maze**, where the layout and solution path are fixed. In a **random maze**, explorers may produce different move counts and backtracking behavior due to path variations and decision branches.
 
 ---
 
@@ -260,10 +257,9 @@ This solution demonstrates a production-ready, distributed system to explore maz
 
 All explorers performed identically, indicating the maze-solving strategy is:
 - **Deterministic**
-- **Highly optimized** for this maze layout
 - **Not prone to loops or dead ends** in this specific configuration
 
-Parallel execution didn't improve solution quality in this case but **did reduce total runtime**. For more meaningful comparisons, running explorers on **random or complex mazes** would provide better insight into strategy efficiency.
+Parallel execution didn't improve solution quality in this case but **did reduce total runtime**.
 
 
 # Question 4 – Enhancing the Maze Explorer
@@ -288,14 +284,14 @@ To address the above limitations, the following improvements were proposed:
 - Uses the Manhattan distance as a heuristic to guide the agent toward the goal.
 
 ### Improvement 2 – Prioritize Unvisited Neighbors More Rigorously
-- In the absence of A*, still prefers directions that have never been visited to reduce loops and backtracking.
+- In the absence of A*, still prefer directions that have never been visited to reduce loops and backtracking.
 - Incorporates structured priority (unvisited > less visited > visited), removing unnecessary randomness.
 
 ---
 
 ## 3. **Implemented Improvements**
 
-We implemented **Improvement 1 (A* Search)** and retained parts of the original logic for visualization and statistics. The `solve()` method has been rewritten to use A* pathfinding, and the rest of the system has been adapted to follow this path.
+I implemented **Improvement 1 (A* Search)** and retained parts of the original logic for visualization and statistics. The `solve()` method has been rewritten to use A* pathfinding, and the rest of the system has been adapted to follow this path.
 
 ---
 
@@ -368,7 +364,7 @@ def solve(self) -> Tuple[float, List[Tuple[int, int]]]:
 
 ---
 
-### 🔍 Summary of Key Changes
+## Summary of Key Changes
 
 | Area                        | Before                              | After (Improved)                               |
 |-----------------------------|--------------------------------------|------------------------------------------------|
@@ -385,10 +381,9 @@ def solve(self) -> Tuple[float, List[Tuple[int, int]]]:
 | Metric                     | Original Explorer      | Enhanced Explorer (A*) |
 |---------------------------|------------------------|------------------------|
 | **Average Time Taken**    | 0.00s - 0.01s          | 0.00s - 0.01s          |
-| **Average Moves Made**    | 1279                   | 128                    |
+| **Moves Made**    | 1279                   | 128                    |
 | **Backtrack Operations**  | 0                      | 0                      |
-| **Best Case Moves**       | 1279                   | 128                    |
-| **Parallel Runtime (10x)**| 3.04s                  | 2.06s                  |
+
 
 ## Key Observations:
 - **Massive Move Reduction**: Enhanced explorer reduced move count by **over 90%**.
@@ -424,7 +419,7 @@ def solve(self) -> Tuple[float, List[Tuple[int, int]]]:
 
 ---
 
-## ✅ Summary
+## Summary
 
 The **enhanced explorer** with A* search **significantly outperforms** the original rule-based or randomized search. It:
 - Reduces move count from **1279 → 128**
