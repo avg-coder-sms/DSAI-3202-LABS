@@ -376,3 +376,59 @@ def solve(self) -> Tuple[float, List[Tuple[int, int]]]:
 | **Efficiency**              | 1279 moves                          | 128 moves            |
 | **Loop Avoidance**          | 3-move history loop check            | Avoids cycles via `came_from` tracking         |
 | **Backtracking**            | Used when stuck                     | Not needed due to optimal path planning        |
+
+
+# Question 5
+
+## 1. **Performance Comparison Results and Analysis**
+
+| Metric                     | Original Explorer      | Enhanced Explorer (A*) |
+|---------------------------|------------------------|------------------------|
+| **Average Time Taken**    | 0.00s - 0.01s          | 0.00s - 0.01s          |
+| **Average Moves Made**    | 1279                   | 128                    |
+| **Backtrack Operations**  | 0                      | 0                      |
+| **Best Case Moves**       | 1279                   | 128                    |
+| **Parallel Runtime (10x)**| 3.04s                  | 2.06s                  |
+
+## Key Observations:
+- **Massive Move Reduction**: Enhanced explorer reduced move count by **over 90%**.
+- **No Backtracking Needed**: A* found an optimal path without backtracking, indicating clean heuristic guidance.
+- **Runtime Efficiency**: Slight reduction in parallel runtime (likely due to reduced computation per agent).
+
+---
+
+## 2. Visual Comparison
+
+### Bar Chart – Moves Comparison
+![alt text](images/moves.png)
+
+### Line Chart – Total Parallel Runtime
+![alt text](images/time.png)
+
+---
+
+## 3. Trade-offs & Limitations
+
+### **Benefits of Enhancement**
+- **Optimal Pathfinding**: A* uses heuristics to find the shortest path, minimizing unnecessary exploration.
+- **Less Memory Waste**: Fewer steps = less state to track.
+- **Consistency**: All explorers converge to same minimal-move path (128).
+
+### **Trade-offs / New Limitations**
+| Trade-off                     | Description |
+|------------------------------|-------------|
+| **Heuristic Dependence**     | The efficiency relies on the heuristic (Manhattan in this case). For irregular cost maps, this may be suboptimal. |
+| **No Exploration Diversity** | Since all explorers follow the exact same A* logic, there is no variability or alternate path testing. |
+| **No Adaptability**          | Doesn’t handle dynamic environments or unknown goal positions (i.e., it's not suitable for "explore-as-you-go" scenarios). |
+| **Initial Setup Time**       | Slightly longer setup to compute heuristic values and maintain a priority queue (though negligible here). |
+
+---
+
+## ✅ Summary
+
+The **enhanced explorer** with A* search **significantly outperforms** the original rule-based or randomized search. It:
+- Reduces move count from **1279 → 128**
+- Maintains negligible runtime
+- Achieves **consistent optimal results across parallel agents**
+
+While it introduces limitations in flexibility and generality, for a static maze with known start and end positions, **A\*** is a major upgrade in both **efficiency** and **performance**.
