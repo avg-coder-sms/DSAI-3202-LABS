@@ -201,68 +201,66 @@ if __name__ == "__main__":
 
 This solution demonstrates a production-ready, distributed system to explore mazes in parallel using Celery and RabbitMQ. We addressed all parts of the question by implementing a robust task queue system and performance comparison logic.
 
-# Question 3: Maze Explorer Performance Analysis
+# Questione3: Maze Explorer Performance Analysis (Static Maze)
 
-## Objective
-To evaluate and compare the performance of **multiple explorers** simultaneously. Each explorer follows the same logic but may explore different paths due to slight variations (e.g., random tie-breaking or execution timing).
-
----
-
-## Experimental Setup
-
-- **Maze Type**: Random (deterministic layout)
+## Experiment Setup
+- **Maze Type**: Static
 - **Number of Explorers**: 10
 - **Execution Mode**: Parallel using Celery
 - **Metrics Collected**:
-  - Total Time Taken to Solve Maze
-  - Number of Moves
-  - Number of Backtracks *(optional)*
+  - Time taken to solve the maze
+  - Total number of moves
+  - Number of backtrack operations (optional)
 
 ---
 
 ## Results Summary
 
 | Explorer | Time Taken (s) | Moves Made | Backtracks |
-|----------|----------------|------------|------------|
-| 1        | 0.00           | 665        | 0          |
-| 2        | 0.00           | 250        | 0          |
-| 3        | 0.00           | 127        | 0          |
-| 4        | 0.00           | 297        | 0          |
-| 5        | 0.00           | 608        | 0          |
-| 6        | 0.00           | 512        | 0          |
-| 7        | 0.00           | 199        | 0          |
-| 8        | 0.00           | 266        | 0          |
-| 9        | 0.00           | 556        | 0          |
-| 10       | 0.00           | 445        | 0          |
+|----------|----------------|------------|-------------|
+| 1        | 0.00           | 1279       | 0           |
+| 2        | 0.00           | 1279       | 0           |
+| 3        | 0.00           | 1279       | 0           |
+| 4        | 0.00           | 1279       | 0           |
+| 5        | 0.01           | 1279       | 0           |
+| 6        | 0.00           | 1279       | 0           |
+| 7        | 0.00           | 1279       | 0           |
+| 8        | 0.00           | 1279       | 0           |
+| 9        | 0.00           | 1279       | 0           |
+| 10       | 0.00           | 1279       | 0           |
 
-** Best Explorer**:  
-- **Explorer 3** with **127 moves** and **0 backtracks**
+ **Best Explorer Performance**:
+- **Time**: 0.00s  
+- **Moves**: 1279  
+- **Backtracks**: 0  
+
+**Total parallel runtime**: 3.04s
 
 ---
 
-## Observations
+## Observations & Analysis
 
-1. **Execution Time**  
-   - All explorers reported `0.00s`, which suggests execution was extremely fast and well below one second.
-   - The actual total runtime across all 10 explorers was approximately **1.06 seconds** — showing excellent parallel execution efficiency.
+1. **Identical Performance Across All Explorers**  
+   Every explorer completed the maze using exactly **1279 moves** with **0 backtracks**. This consistency indicates that the static maze is deterministic and the algorithm used (likely the right-hand rule) follows a fixed path regardless of the process or ID.
 
-2. **Number of Moves**  
-   - Significant variation in path lengths: from **127 moves (Explorer 3)** to **665 moves (Explorer 1)**.
-   - This indicates different paths and exploration efficiencies.
+2. **No Backtracking Observed**  
+   The lack of any backtracking implies:
+   - The path does not require the explorer to return on its steps.
+   - The right-hand rule or wall-following strategy is highly effective in this specific maze configuration.
 
-3. **Backtracks**  
-   - All explorers reported **0 backtracks**, which implies:
-     - The algorithm possibly uses loop detection or direction memory to avoid revisiting paths.
-     - Or, the algorithm aggressively avoids dead ends using the right-hand rule without needing to undo steps.
+3. **Negligible Time Differences**  
+   All runs were completed in **~0.00s**, with only one showing a marginal difference of **0.01s**. This likely reflects minor variations in task scheduling rather than any actual computational difference.
 
-4. **Parallelization Benefit**  
-   - By running multiple explorers in parallel, we can quickly identify the **optimal path** (shortest one), saving significant analysis time.
+4. **Deterministic vs. Random Mazes**  
+   This test was run on a **static maze**, where the layout and solution path are fixed. In a **random maze**, explorers may produce different move counts and backtracking behavior due to path variations and decision branches.
 
 ---
 
 ## Conclusion
 
-- Despite using the **same maze and logic**, explorers exhibited varied path lengths due to non-deterministic decisions or pathfinding variations.
-- **Explorer 3** demonstrated the most efficient traversal with **127 moves**, likely hitting the correct path with minimal detours.
-- **Zero backtracks** across all explorers suggest that the current exploration strategy is **efficient in loop avoidance**.
-- **Parallel execution** enabled efficient evaluation and optimization, providing a powerful tool to select the best route in real-time applications.
+All explorers performed identically, indicating the maze-solving strategy is:
+- **Deterministic**
+- **Highly optimized** for this maze layout
+- **Not prone to loops or dead ends** in this specific configuration
+
+Parallel execution didn't improve solution quality in this case but **did reduce total runtime**. For more meaningful comparisons, running explorers on **random or complex mazes** would provide better insight into strategy efficiency.
