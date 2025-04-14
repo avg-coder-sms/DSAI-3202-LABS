@@ -264,3 +264,115 @@ All explorers performed identically, indicating the maze-solving strategy is:
 - **Not prone to loops or dead ends** in this specific configuration
 
 Parallel execution didn't improve solution quality in this case but **did reduce total runtime**. For more meaningful comparisons, running explorers on **random or complex mazes** would provide better insight into strategy efficiency.
+
+
+# Question 4 – Enhancing the Maze Explorer
+
+## 1. **Identified Limitations of the Current Explorer**
+
+The original implementation of the maze explorer uses a rule-based heuristic inspired by the right-hand rule with added randomness and visited-count tracking. However, it suffers from several limitations:
+
+- **Inefficient pathfinding:** The explorer frequently revisits cells or explores dead ends before reaching the goal. The number of moves is significantly higher than optimal.
+- **Randomness in decision-making:** Random selection among equally visited cells causes inconsistent and sometimes suboptimal paths.
+- **Poor loop avoidance:** Even with a 3-step loop detection system, the agent can enter longer cycles and backtrack unnecessarily.
+- **No global memory of optimal paths:** The agent has no knowledge of the shortest path or goal-oriented strategy like A*, leading to inefficiencies in exploration.
+
+---
+
+## 2. **Proposed Improvements to the Exploration Algorithm**
+
+To address the above limitations, the following improvements were proposed:
+
+### Improvement 1 – Implement A* Search Algorithm
+- Replaces rule-based exploration with a goal-oriented heuristic.
+- Uses the Manhattan distance as a heuristic to guide the agent toward the goal.
+
+### Improvement 2 – Prioritize Unvisited Neighbors More Rigorously
+- In the absence of A*, still prefers directions that have never been visited to reduce loops and backtracking.
+- Incorporates structured priority (unvisited > less visited > visited), removing unnecessary randomness.
+
+---
+
+## 3. **Implemented Improvements**
+
+We implemented **Improvement 1 (A* Search)** and retained parts of the original logic for visualization and statistics. The `solve()` method has been rewritten to use A* pathfinding, and the rest of the system has been adapted to follow this path.
+
+---
+
+## Modified Code with Explanations
+
+```python
+def solve(self) -> Tuple[float, List[Tuple[int, int]]]:
+    """Solve the maze using A* search algorithm."""
+    self.start_time = time.time()
+    start = self.maze.start_pos
+    goal = self.maze.end_pos
+
+    def heuristic(a, b):
+        # Manhattan distance
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+    from heapq import heappush, heappop
+
+    open_set = []
+    heappush(open_set, (0 + heuristic(start, goal), 0, start))
+    came_from = {}
+    g_score = {start: 0}
+
+    while open_set:
+        _, current_cost, current = heappop(open_set)
+
+        if current == goal:
+            break  # Reached the goal
+
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            neighbor = (current[0] + dx, current[1] + dy)
+            if not self.can_move(*neighbor):
+                continue
+            tentative_g = g_score[current] + 1
+            if neighbor not in g_score or tentative_g < g_score[neighbor]:
+                g_score[neighbor] = tentative_g
+                priority = tentative_g + heuristic(neighbor, goal)
+                heappush(open_set, (priority, tentative_g, neighbor))
+                came_from[neighbor] = current
+
+    # Reconstruct path
+    path = []
+    node = goal
+    while node != start:
+        path.append(node)
+        node = came_from.get(node)
+        if node is None:
+            print("No path found.")
+            return 0, []  # No path found
+    path.append(start)
+    path.reverse()
+
+    # Traverse the path and draw
+    for px, py in path:
+        self.x, self.y = px, py
+        self.moves.append((self.x, self.y))
+        self._update_visited(self.x, self.y)
+        if self.visualize:
+            self.draw_state()
+
+    self.end_time = time.time()
+    if self.visualize:
+        pygame.time.wait(2000)
+        pygame.quit()
+
+    time_taken = self.end_time - self.start_time
+    self.print_statistics(time_taken)
+    return time_taken, self.moves
+```
+
+---
+
+### 🔍 Summary of Key Changes
+
+| Area                        | Before                              | After (Improved)                               |
+|-----------------------------|--------------------------------------|------------------------------------------------|
+| **Search Strategy**         | Rule-based + random + visit counts  | A* Search using Manhattan Distance             |
+| **Efficiency**              | 1279 moves                          | 128 moves            |
+| **Loop Avoidance**          | 3-move history loop check            | Avoids cycles via `came_from` tracking         |
+| **Backtracking**            | Used when stuck                     | Not needed due to optimal path planning        |

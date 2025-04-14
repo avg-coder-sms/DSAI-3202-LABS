@@ -18,3 +18,24 @@ Time: 0.00s, Moves: 1279, Backtracks: 0
 Total parallel runtime: 3.04s
 === Run ended at 2025-04-14 09:42:30 ===
 
+After enhancements:
+
+=== Run started at 2025-04-14 10:34:19 ===
+Spawning 10 parallel explorers...
+
+=== Results from all explorers ===
+Explorer 1: Time = 0.00s, Moves = 128, Backtracks = 0
+Explorer 2: Time = 0.00s, Moves = 128, Backtracks = 0
+Explorer 3: Time = 0.01s, Moves = 128, Backtracks = 0
+Explorer 4: Time = 0.00s, Moves = 128, Backtracks = 0
+Explorer 5: Time = 0.00s, Moves = 128, Backtracks = 0
+Explorer 6: Time = 0.01s, Moves = 128, Backtracks = 0
+Explorer 7: Time = 0.01s, Moves = 128, Backtracks = 0
+Explorer 8: Time = 0.01s, Moves = 128, Backtracks = 0
+Explorer 9: Time = 0.00s, Moves = 128, Backtracks = 0
+Explorer 10: Time = 0.01s, Moves = 128, Backtracks = 0
+
+ Best Explorer Performance:
+Time: 0.00s, Moves: 128, Backtracks: 0
+Total parallel runtime: 2.06s
+=== Run ended at 2025-04-14 10:34:21 ===

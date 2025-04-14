@@ -1,12 +1,22 @@
-"""
-Maze Explorer module that implements automated maze solving.
-"""
-
 import time
 import pygame
-from typing import Tuple, List, Optional, Deque
+from typing import Tuple, List, Optional
 from collections import deque
 from .constants import BLUE, WHITE, CELL_SIZE, WINDOW_SIZE
+import heapq
+
+# NEW CLASS: Node used for A* algorithm
+class Node:
+    def __init__(self, x, y, parent=None):
+        self.x = x
+        self.y = y
+        self.parent = parent
+        self.g = 0  # Cost to get here
+        self.h = 0  # Estimated cost to goal
+        self.f = 0  # Total cost (g + h)
+
+    def __lt__(self, other):
+        return self.f < other.f
 
 class Explorer:
     def __init__(self, maze, visualize: bool = False):
@@ -17,134 +27,107 @@ class Explorer:
         self.start_time = None
         self.end_time = None
         self.visualize = visualize
-        self.move_history = deque(maxlen=3)  # Keep track of last 3 moves
+        self.move_history = deque(maxlen=3)  # For simple loop detection
         self.backtracking = False
         self.backtrack_path = []
         self.backtrack_count = 0  # Count number of backtrack operations
+
+        # MODIFIED: Track how many times each cell is visited
+        self.visited_counts = {}
+        self._update_visited(self.x, self.y)
+
         if visualize:
             pygame.init()
             self.screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
             pygame.display.set_caption("Maze Explorer - Automated Solving")
             self.clock = pygame.time.Clock()
 
-    def turn_right(self):
-        """Turn 90 degrees to the right."""
-        x, y = self.direction
-        self.direction = (-y, x)
+    def _update_visited(self, x, y):
+        pos = (x, y)
+        self.visited_counts[pos] = self.visited_counts.get(pos, 0) + 1
 
-    def turn_left(self):
-        """Turn 90 degrees to the left."""
-        x, y = self.direction
-        self.direction = (y, -x)
+    def can_move(self, x, y) -> bool:
+        return (0 <= x < self.maze.width and 
+                0 <= y < self.maze.height and 
+                self.maze.grid[y][x] == 0)
 
-    def can_move_forward(self) -> bool:
-        """Check if we can move forward in the current direction."""
-        dx, dy = self.direction
-        new_x, new_y = self.x + dx, self.y + dy
-        return (0 <= new_x < self.maze.width and 
-                0 <= new_y < self.maze.height and 
-                self.maze.grid[new_y][new_x] == 0)
+    # NEW: Manhattan distance heuristic for A*
+    def heuristic(self, x, y, goal_x, goal_y):
+        return abs(x - goal_x) + abs(y - goal_y)
 
-    def move_forward(self):
-        """Move forward in the current direction."""
-        dx, dy = self.direction
-        self.x += dx
-        self.y += dy
-        current_move = (self.x, self.y)
-        self.moves.append(current_move)
-        self.move_history.append(current_move)
-        if self.visualize:
-            self.draw_state()
+    # NEW: A* search algorithm implementation
+    def a_star(self):
+        open_list = []
+        closed_list = set()
 
-    def is_stuck(self) -> bool:
-        """Check if the explorer is stuck in a loop."""
-        if len(self.move_history) < 3:
-            return False
-        # Check if the last 3 moves are the same
-        return (self.move_history[0] == self.move_history[1] == self.move_history[2])
+        start_node = Node(self.x, self.y)
+        start_node.g = 0
+        start_node.h = self.heuristic(self.x, self.y, self.maze.end_pos[0], self.maze.end_pos[1])
+        start_node.f = start_node.g + start_node.h
 
-    def backtrack(self) -> bool:
-        """Backtrack to the last position where we had multiple choices."""
-        if not self.backtrack_path:
-            # If we don't have a backtrack path, find one
-            self.backtrack_path = self.find_backtrack_path()
-        
-        if self.backtrack_path:
-            # Move to the next position in the backtrack path
-            next_pos = self.backtrack_path.pop()
-            self.x, self.y = next_pos
-            self.backtrack_count += 1
+        heapq.heappush(open_list, start_node)
+
+        while open_list:
+            current_node = heapq.heappop(open_list)
+            closed_list.add((current_node.x, current_node.y))
+
+            if (current_node.x, current_node.y) == self.maze.end_pos:
+                # PATH FOUND: Trace back the path using parent pointers
+                path = []
+                while current_node:
+                    path.append((current_node.x, current_node.y))
+                    current_node = current_node.parent
+                return path[::-1]  # Return reversed path from start to end
+
+            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                new_x, new_y = current_node.x + dx, current_node.y + dy
+
+                if not self.can_move(new_x, new_y) or (new_x, new_y) in closed_list:
+                    continue
+
+                neighbor = Node(new_x, new_y, current_node)
+                neighbor.g = current_node.g + 1
+                neighbor.h = self.heuristic(new_x, new_y, self.maze.end_pos[0], self.maze.end_pos[1])
+                neighbor.f = neighbor.g + neighbor.h
+
+                # OPTIMIZED: Only add if this path is better than existing one
+                if all(neighbor.f < node.f for node in open_list if (node.x, node.y) == (new_x, new_y)):
+                    heapq.heappush(open_list, neighbor)
+
+        return None  # No path found
+
+    # NEW: Follow the computed path
+    def move_to(self, path: List[Tuple[int, int]]):
+        for (x, y) in path:
+            self.x, self.y = x, y
+            self.moves.append((self.x, self.y))
+            self._update_visited(self.x, self.y)
             if self.visualize:
                 self.draw_state()
-            return True
-        return False
-
-    def find_backtrack_path(self) -> List[Tuple[int, int]]:
-        """Find a path back to a position with multiple choices."""
-        # Start from current position and go backwards through moves
-        path = []
-        current_pos = (self.x, self.y)
-        visited = set()
-        
-        # Look for a position where we had multiple choices
-        for i in range(len(self.moves) - 1, -1, -1):
-            pos = self.moves[i]
-            if pos in visited:
-                continue
-            visited.add(pos)
-            path.append(pos)
-            
-            # Check if this position had multiple choices
-            choices = self.count_available_choices(pos)
-            if choices > 1:
-                return path[::-1]  # Return reversed path
-        
-        return path[::-1]  # Return reversed path if no better position found
-
-    def count_available_choices(self, pos: Tuple[int, int]) -> int:
-        """Count the number of available moves from a position."""
-        x, y = pos
-        choices = 0
-        for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
-            new_x, new_y = x + dx, y + dy
-            if (0 <= new_x < self.maze.width and 
-                0 <= new_y < self.maze.height and 
-                self.maze.grid[new_y][new_x] == 0):
-                choices += 1
-        return choices
 
     def draw_state(self):
-        """Draw the current state of the maze and explorer."""
         self.screen.fill(WHITE)
-        
-        # Draw maze
         for y in range(self.maze.height):
             for x in range(self.maze.width):
                 if self.maze.grid[y][x] == 1:
                     pygame.draw.rect(self.screen, (0, 0, 0),
-                                   (x * CELL_SIZE, y * CELL_SIZE,
-                                    CELL_SIZE, CELL_SIZE))
-        
-        # Draw start and end points
+                                     (x * CELL_SIZE, y * CELL_SIZE,
+                                      CELL_SIZE, CELL_SIZE))
         pygame.draw.rect(self.screen, (0, 255, 0),
-                        (self.maze.start_pos[0] * CELL_SIZE,
-                         self.maze.start_pos[1] * CELL_SIZE,
-                         CELL_SIZE, CELL_SIZE))
+                         (self.maze.start_pos[0] * CELL_SIZE,
+                          self.maze.start_pos[1] * CELL_SIZE,
+                          CELL_SIZE, CELL_SIZE))
         pygame.draw.rect(self.screen, (255, 0, 0),
-                        (self.maze.end_pos[0] * CELL_SIZE,
-                         self.maze.end_pos[1] * CELL_SIZE,
-                         CELL_SIZE, CELL_SIZE))
-        
-        # Draw explorer
+                         (self.maze.end_pos[0] * CELL_SIZE,
+                          self.maze.end_pos[1] * CELL_SIZE,
+                          CELL_SIZE, CELL_SIZE))
         pygame.draw.rect(self.screen, BLUE,
-                        (self.x * CELL_SIZE, self.y * CELL_SIZE,
-                         CELL_SIZE, CELL_SIZE))
-        
+                         (self.x * CELL_SIZE, self.y * CELL_SIZE,
+                          CELL_SIZE, CELL_SIZE))
         pygame.display.flip()
-        self.clock.tick(30)  # Control visualization speed
+        self.clock.tick(30)
 
     def print_statistics(self, time_taken: float):
-        """Print detailed statistics about the exploration."""
         print("\n=== Maze Exploration Statistics ===")
         print(f"Total time taken: {time_taken:.2f} seconds")
         print(f"Total moves made: {len(self.moves)}")
@@ -152,63 +135,24 @@ class Explorer:
         print(f"Average moves per second: {len(self.moves)/time_taken:.2f}")
         print("==================================\n")
 
+    # MODIFIED: New solve function that integrates A* path and tracking
     def solve(self) -> Tuple[float, List[Tuple[int, int]]]:
-        """
-        Solve the maze using the right-hand rule algorithm with backtracking.
-        Returns the time taken and the list of moves made.
-        """
         self.start_time = time.time()
-        
-        # Keep track of visited positions to detect loops
         visited = set()
         visited.add((self.x, self.y))
-        
         if self.visualize:
             self.draw_state()
-        
-        while (self.x, self.y) != self.maze.end_pos:
-            if self.is_stuck():
-                # If stuck, try backtracking
-                if not self.backtrack():
-                    # If backtracking fails, try a different direction
-                    self.turn_left()
-                    self.turn_left()  # Turn around
-                    self.move_forward()
-                self.backtracking = True
-            else:
-                self.backtracking = False
-                # Try to turn right first
-                self.turn_right()
-                if self.can_move_forward():
-                    self.move_forward()
-                    visited.add((self.x, self.y))
-                else:
-                    # If we can't move right, try forward
-                    self.turn_left()
-                    if self.can_move_forward():
-                        self.move_forward()
-                        visited.add((self.x, self.y))
-                    else:
-                        # If we can't move forward, try left
-                        self.turn_left()
-                        if self.can_move_forward():
-                            self.move_forward()
-                            visited.add((self.x, self.y))
-                        else:
-                            # If we can't move left, turn around
-                            self.turn_left()
-                            self.move_forward()
-                            visited.add((self.x, self.y))
+
+        path = self.a_star()  # Use A* to find optimal path
+
+        if path:
+            self.move_to(path)  # Traverse the path using new move_to()
 
         self.end_time = time.time()
         time_taken = self.end_time - self.start_time
-        
         if self.visualize:
-            # Show final state for a few seconds
             pygame.time.wait(2000)
             pygame.quit()
-        
-        # Print detailed statistics
+
         self.print_statistics(time_taken)
-            
-        return time_taken, self.moves 
+        return time_taken, self.moves
